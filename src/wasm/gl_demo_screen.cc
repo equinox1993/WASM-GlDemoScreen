@@ -12,6 +12,7 @@ namespace {
 
 const GLfloat kVertexData[] = {0, 0, 0, 1, 1, 0, 1, 1};
 const GLfloat kOffsetIncrement = 5.f;
+const GLfloat kTileSize = 200.f;
 
 const GLchar* kVertexShaderSource = R"(
   precision mediump float;
@@ -42,14 +43,14 @@ const GLchar* kVertexShaderSource = R"(
 const GLchar* kFragmentShaderSource = R"(
   precision mediump float;
 
-  const vec2 c_tileSize = vec2(200, 200);
   varying vec2 v_position;
+  uniform vec2 u_tileSize;
   uniform vec2 u_viewSize;
   uniform vec2 u_offset;
 
   void main() {
     vec2 tile_position =
-        floor((v_position * u_viewSize + u_offset) / c_tileSize);
+        floor((v_position * u_viewSize + u_offset) / u_tileSize);
     vec2 mod_map = tile_position - 2.0 * floor(tile_position / 2.0);
     bool isGreen = mod_map.x == mod_map.y;
     gl_FragColor =
@@ -109,6 +110,12 @@ GlDemoScreen::GlDemoScreen() {
   glLinkProgram(program_);
 
   buffer_ = CreateBuffer(kVertexData, sizeof(kVertexData));
+
+  // Set the tile size.
+  glUseProgram(program_);
+  GLuint tile_size_loc = glGetUniformLocation(program_, "u_tileSize");
+  GLfloat tile_size[] = {kTileSize, kTileSize};
+  glUniform2fv(tile_size_loc, 1, tile_size);
 }
 
 GlDemoScreen::~GlDemoScreen() {
@@ -139,8 +146,8 @@ void GlDemoScreen::Draw(float width, float height) {
   
   // Increment offset for future animations.
   offset_xy_ += kOffsetIncrement;
-  if (offset_xy_ >= width * height) {
-    offset_xy_ -= width * height;
+  if (offset_xy_ >= kTileSize) {
+    offset_xy_ -= kTileSize;
   }
 
   // Send geometry to vertex shader.

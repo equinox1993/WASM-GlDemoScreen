@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>GlDemoScreen</title>
+    <style>
+      html {
+        height: 100%;
+      }
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
+      #canvas.emscripten {
+        position: absolute;
+        border: 0px none;
+        background-color: black;
+      }
+      .emscripten.logs-container {
+        background-color: rgba(255, 255, 255, 0.5);
+        position: absolute;
+        top: 0;
+        font-family: monospace;
+        font-size: 16pt;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+    <div class="emscripten logs-container">
+      <div class="emscripten" id="status">Downloading...</div>
+      <div class="emscripten" id="output"></div>
+    </div>
+    <script type='text/javascript'>
+      var canvasElement = document.getElementById('canvas');
+      var statusElement = document.getElementById('status');
+      var Module = {
+        preRun: [],
+        postRun: [],
+        print: (function() {
+          var element = document.getElementById('output');
+          if (element) element.innerText = ''; // clear browser cache
+          return function(text) {
+            if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+            // These replacements are necessary if you render to raw HTML
+            //text = text.replace(/&/g, "&amp;");
+            //text = text.replace(/</g, "&lt;");
+            //text = text.replace(/>/g, "&gt;");
+            //text = text.replace('\n', '<br>', 'g');
+            console.log(text);
+            if (element) {
+              var lines = element.innerText.split('\n');
+              if (lines.length > 5) {
+                lines.splice(0, 1);
+              }
+              lines.push(text);
+              element.innerText = lines.join('\n').trim();
+            }
+          };
+        })(),
+        printErr: function(text) {
+          if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+          if (0) { // XXX disabled for safety typeof dump == 'function') {
+            dump(text + '\n'); // fast, straight to the real console
+          } else {
+            console.error(text);
+          }
+        },
+        canvas: (function() {
+          // As a default initial behavior, pop up an alert when webgl context is lost. To make your
+          // application robust, you may want to override this behavior before shipping!
+          // See http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.15.2
+          canvasElement.addEventListener("webglcontextlost", function(e) { alert('WebGL context lost. You will need to reload the page.'); e.preventDefault(); }, false);
+          return canvasElement;
+        })(),
+        setStatus: function(text) {
+          statusElement.innerText = text;
+        },
+        totalDependencies: 0,
+        monitorRunDependencies: function(left) {
+          this.totalDependencies = Math.max(this.totalDependencies, left);
+          Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+        }
+      };
+      Module.setStatus('Downloading...');
+      window.onerror = function() {
+        Module.setStatus('Exception thrown, see JavaScript console');
+        Module.setStatus = function(text) {
+          if (text) Module.printErr('[post-exception status] ' + text);
+        };
+      };
+      window.onresize = function() {
+        var boundingRect = document.body.getBoundingClientRect();
+        canvasElement.width = boundingRect.width;
+        canvasElement.height = boundingRect.height;
+      };
+      window.onresize();
+    </script>
+    <script async type="text/javascript" src="gl_demo_screen.js"></script>
+  </body>
+</html>
+
+
