@@ -1,7 +1,7 @@
 # WASM GlDemoScreen
 
 This is a simple WebAssembly and OpenGL ES demo that shows a grid of tiles
-moving across the screen. Some code is copied from the
+moving across the screen. Some files are copied and modified from the
 [Chromium remoting](https://cs.chromium.org/chromium/src/remoting/) project.
 
 [Click here](https://equinox1993.github.io/WASM-GlDemoScreen/out/gl_demo_screen.html)
