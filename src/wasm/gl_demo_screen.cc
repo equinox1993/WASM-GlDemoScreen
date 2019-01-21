@@ -10,8 +10,7 @@
 
 namespace {
 
-const GLfloat kVertexData[] = {0, 0, 0, 0, 0, 0, 0, 0};
-
+const GLfloat kVertexData[] = {0, 0, 0, 1, 1, 0, 1, 1};
 const GLfloat kOffsetIncrement = 5.f;
 
 const GLchar* kVertexShaderSource = R"(
@@ -26,7 +25,6 @@ const GLchar* kVertexShaderSource = R"(
                                 -1, 1, 0);
 
   attribute vec2 a_position;
-  uniform vec2 u_viewSize;
   varying vec2 v_position;
 
   void main() {
@@ -34,7 +32,7 @@ const GLchar* kVertexShaderSource = R"(
     v_position = a_position;
 
     // Transform texture coordinates to view coordinates
-    vec3 trans_position = c_texToView * vec3(a_position / u_viewSize, 1.0);
+    vec3 trans_position = c_texToView * vec3(a_position, 1.0);
 
     // Add projection component 1
     gl_Position = vec4(trans_position, 1.0);
@@ -46,10 +44,12 @@ const GLchar* kFragmentShaderSource = R"(
 
   const vec2 c_tileSize = vec2(200, 200);
   varying vec2 v_position;
+  uniform vec2 u_viewSize;
   uniform vec2 u_offset;
 
   void main() {
-    vec2 tile_position = floor((v_position + u_offset) / c_tileSize);
+    vec2 tile_position =
+        floor((v_position * u_viewSize + u_offset) / c_tileSize);
     vec2 mod_map = tile_position - 2.0 * floor(tile_position / 2.0);
     bool isGreen = mod_map.x == mod_map.y;
     gl_FragColor =
@@ -143,8 +143,6 @@ void GlDemoScreen::Draw(float width, float height) {
 
   // Send geometry to vertex shader.
   glBindBuffer(GL_ARRAY_BUFFER, buffer_);
-  GLfloat vertices[] = {0, 0, 0, height, width, 0, width, height};
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
   GLuint position_loc = glGetAttribLocation(program_, "a_position");
   glVertexAttribPointer(position_loc, 2, GL_FLOAT, GL_FALSE, 0, 0);
   glEnableVertexAttribArray(position_loc);
