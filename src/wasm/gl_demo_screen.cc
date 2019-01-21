@@ -144,7 +144,7 @@ void GlDemoScreen::Draw(float width, float height) {
   // Send geometry to vertex shader.
   glBindBuffer(GL_ARRAY_BUFFER, buffer_);
   GLfloat vertices[] = {0, 0, 0, height, width, 0, width, height};
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices) / 2, vertices);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
   GLuint position_loc = glGetAttribLocation(program_, "a_position");
   glVertexAttribPointer(position_loc, 2, GL_FLOAT, GL_FALSE, 0, 0);
   glEnableVertexAttribArray(position_loc);
