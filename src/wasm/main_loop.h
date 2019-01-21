@@ -18,8 +18,8 @@ class MainLoop {
 
   EglThreadContext thread_context_;
   GlDemoScreen demo_screen_;
-  double canvas_width_ = 0;
-  double canvas_height_ = 0;
+  int canvas_width_ = 0;
+  int canvas_height_ = 0;
 
   DISALLOW_COPY_AND_ASSIGN(MainLoop);
 };

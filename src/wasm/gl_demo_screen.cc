@@ -119,6 +119,8 @@ GlDemoScreen::~GlDemoScreen() {
 }
 
 void GlDemoScreen::Draw(float width, float height) {
+  glViewport(0, 0, width, height);
+
   // Clear.
   glClearColor(0, 0, 0, 0);
   glClear(GL_COLOR_BUFFER_BIT);

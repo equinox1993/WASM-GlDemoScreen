@@ -31,8 +31,8 @@ void MainLoop::Loop() {
 }
 
 void MainLoop::LoopInternal() {
-  double width, height;
-  emscripten_get_element_css_size("#canvas", &width, &height);
+  int width, height;
+  emscripten_get_canvas_element_size("#canvas", &width, &height);
   if (width != canvas_width_ || height != canvas_height_) {
     std::cout << "New canvas size: " << width << " x " << height << std::endl;
     canvas_width_ = width;
