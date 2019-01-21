@@ -15,10 +15,10 @@ class GlDemoScreen {
   GlDemoScreen();
   ~GlDemoScreen();
 
-  void Draw(int width, int height);
+  void Draw(float width, float height);
 
  private:
-  int square_size_ = 0;
+  GLfloat offset_xy_ = 0.f;
 
   GLuint vertex_shader_;
   GLuint fragment_shader_;
