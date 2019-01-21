@@ -10,8 +10,6 @@
 #define EGL_OPENGL_ES3_BIT 0
 #endif
 
-namespace remoting {
-
 EglThreadContext::EglThreadContext() {
   display_ = eglGetDisplay(EGL_DEFAULT_DISPLAY);
   if (!display_ || !eglInitialize(display_, NULL, NULL)) {
@@ -24,7 +22,7 @@ EglThreadContext::EglThreadContext() {
     client_version_ = GlVersion::ES_3;
   } else if (CreateContextWithClientVersion(EGL_OPENGL_ES2_BIT,
                                             GlVersion::ES_2)) {
-    std::cout << "OpenGL ES 3 context not supported."
+    std::cout << "OpenGL ES 3 context not supported. "
               << "Falled back to OpenGL ES 2" << std::endl;
     client_version_ = GlVersion::ES_2;
   } else {
@@ -42,21 +40,21 @@ EglThreadContext::~EglThreadContext() {
 }
 
 void EglThreadContext::BindToWindow(EGLNativeWindowType window) {
-  if (surface_) {
-    eglDestroySurface(display_, surface_);
-    surface_ = EGL_NO_SURFACE;
-  }
-  if (window) {
-    surface_ = eglCreateWindowSurface(display_, config_, window, NULL);
-    if (!surface_) {
-      std::cerr << "Failed to create window surface: " << eglGetError()
-                << std::endl;
-    }
-  } else {
-    surface_ = EGL_NO_SURFACE;
+  UnbindFromWindow();
+  surface_ = eglCreateWindowSurface(display_, config_, window, NULL);
+  if (!surface_) {
+    std::cerr << "Failed to create window surface: " << eglGetError()
+              << std::endl;
   }
   if (!eglMakeCurrent(display_, surface_, surface_, context_)) {
     std::cerr << "Failed to make current: " << eglGetError() << std::endl;
+  }
+}
+
+void EglThreadContext::UnbindFromWindow() {
+  if (surface_) {
+    eglDestroySurface(display_, surface_);
+    surface_ = EGL_NO_SURFACE;
   }
 }
 
@@ -103,5 +101,3 @@ bool EglThreadContext::CreateContextWithClientVersion(
                               context_attribs);
   return context_ != EGL_NO_CONTEXT;
 }
-
-}  // namespace remoting

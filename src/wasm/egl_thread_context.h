@@ -2,12 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef REMOTING_CLIENT_JNI_EGL_THREAD_CONTEXT_H_
-#define REMOTING_CLIENT_JNI_EGL_THREAD_CONTEXT_H_
+#ifndef GL_DEMO_SCREEN_EGL_THREAD_CONTEXT_H_
+#define GL_DEMO_SCREEN_EGL_THREAD_CONTEXT_H_
 
 #include <EGL/egl.h>
 
-namespace remoting {
+#include "macros.h"
 
 // Establishes an EGL-OpenGL|ES 2 (if 3 is not supported) or 3 (backward
 // compatible with 2) context on current thread. Must be constructed, used, and
@@ -25,9 +25,9 @@ class EglThreadContext {
   ~EglThreadContext();
 
   // Creates a surface on the given window and binds the context to the surface.
-  // Unbinds |window| last bound if |window| is NULL.
   // EGLNativeWindowType is platform specific. E.g. ANativeWindow* on Android.
   void BindToWindow(EGLNativeWindowType window);
+  void UnbindFromWindow();
 
   // Returns true if the context is bound to a window (i.e. current surface is
   // not NULL).
@@ -56,10 +56,7 @@ class EglThreadContext {
   EGLContext context_ = EGL_NO_CONTEXT;
   GlVersion client_version_ = GlVersion::UNKNOWN;
 
-  EglThreadContext(EglThreadContext&&) = delete;
-  EglThreadContext(const EglThreadContext&) = delete;
+  DISALLOW_COPY_AND_ASSIGN(EglThreadContext);
 };
 
-}  // namespace remoting
-
-#endif  // REMOTING_CLIENT_JNI_EGL_THREAD_CONTEXT_H_
+#endif  // GL_DEMO_SCREEN_EGL_THREAD_CONTEXT_H_
